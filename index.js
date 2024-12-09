@@ -27,7 +27,7 @@ async function run() {
     app.post("/posts", async (req, res) => {
       const post = req.body;
       const result = await postsCollection.insertOne(post);
-      console.log(result);
+
       res.send(result);
     });
     app.post("/users", async (req, res) => {
@@ -35,7 +35,7 @@ async function run() {
       try {
         const query = { email: user.email };
         const existingUser = await userCollection.findOne(query);
-        console.log(existingUser);
+
         if (existingUser) {
           return res.send({ message: "User already exists" });
         }
@@ -44,7 +44,15 @@ async function run() {
       }
 
       const result = await userCollection.insertOne(user);
-      console.log(result);
+
+      res.send(result);
+    });
+    app.get("/users", async (req, res) => {
+      const email = req.query.email;
+
+      const query = { email: email };
+
+      const result = await userCollection.findOne(query);
       res.send(result);
     });
 
@@ -55,7 +63,6 @@ async function run() {
     });
     app.get("/posts/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
 
       const query = { _id: new ObjectId(id) };
 
