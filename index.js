@@ -74,7 +74,6 @@ async function run() {
         let posts;
 
         if (query) {
-          // If a search query exists, use $regex for a case-insensitive search
           posts = await postsCollection
             .find({
               $or: [
@@ -85,7 +84,6 @@ async function run() {
             })
             .toArray();
         } else {
-          // If no query, return all posts
           posts = await postsCollection.find().toArray();
         }
 
@@ -110,6 +108,34 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+    app.patch("/posts/upvote/:id", async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const result = await postsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $inc: { upVote: 1 } }
+        );
+        res.status(200).send(result);
+      } catch (error) {
+        res.status(500).send({ error: "Failed to upvote post" });
+      }
+    });
+
+    app.patch("/posts/downvote/:id", async (req, res) => {
+      const { id } = req.params;
+
+      try {
+        const result = await postsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $inc: { downVote: 1 } }
+        );
+        res.status(200).send(result);
+      } catch (error) {
+        res.status(500).send({ error: "Failed to downvote post" });
+      }
+    });
+
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
