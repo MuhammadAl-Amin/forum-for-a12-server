@@ -8,15 +8,15 @@ app.use(cors());
 app.use(express.json());
 
 //Must remove "/" from your production URL
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://forum-for-a12.web.app",
-      "https://forum-for-a12.firebaseapp.com",
-    ],
-  })
-);
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "https://forum-for-a12.web.app",
+//       "https://forum-for-a12.firebaseapp.com",
+//     ],
+//   })
+// );
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8ewkf10.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -68,9 +68,31 @@ async function run() {
     });
 
     app.get("/posts", async (req, res) => {
-      const cursor = postsCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
+      const { query } = req.query;
+
+      try {
+        let posts;
+
+        if (query) {
+          // If a search query exists, use $regex for a case-insensitive search
+          posts = await postsCollection
+            .find({
+              $or: [
+                { title: { $regex: query, $options: "i" } },
+                { description: { $regex: query, $options: "i" } },
+                { tag: { $regex: query, $options: "i" } },
+              ],
+            })
+            .toArray();
+        } else {
+          // If no query, return all posts
+          posts = await postsCollection.find().toArray();
+        }
+
+        res.status(200).send(posts);
+      } catch (error) {
+        res.status(500).send({ error: "Failed to fetch posts" });
+      }
     });
     app.get("/posts/:id", async (req, res) => {
       const id = req.params.id;
@@ -89,12 +111,12 @@ async function run() {
       res.send(result);
     });
     // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
+    await client.connect();
     // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
-    // console.log(
-    //   "Pinged your deployment. You successfully connected to MongoDB!"
-    // );
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
