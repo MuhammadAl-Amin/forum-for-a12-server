@@ -108,33 +108,6 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-    app.patch("/posts/upvote/:id", async (req, res) => {
-      const { id } = req.params;
-
-      try {
-        const result = await postsCollection.updateOne(
-          { _id: new ObjectId(id) },
-          { $inc: { upVote: 1 } }
-        );
-        res.status(200).send(result);
-      } catch (error) {
-        res.status(500).send({ error: "Failed to upvote post" });
-      }
-    });
-
-    app.patch("/posts/downvote/:id", async (req, res) => {
-      const { id } = req.params;
-
-      try {
-        const result = await postsCollection.updateOne(
-          { _id: new ObjectId(id) },
-          { $inc: { downVote: 1 } }
-        );
-        res.status(200).send(result);
-      } catch (error) {
-        res.status(500).send({ error: "Failed to downvote post" });
-      }
-    });
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
