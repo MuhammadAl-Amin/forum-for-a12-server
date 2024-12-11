@@ -7,16 +7,16 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 
-//Must remove "/" from your production URL
-// app.use(
-//   cors({
-//     origin: [
-//       "http://localhost:5173",
-//       "https://forum-for-a12.web.app",
-//       "https://forum-for-a12.firebaseapp.com",
-//     ],
-//   })
-// );
+// Must remove "/" from your production URL
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://forum-for-a12.web.app",
+      "https://forum-for-a12.firebaseapp.com",
+    ],
+  })
+);
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.8ewkf10.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
