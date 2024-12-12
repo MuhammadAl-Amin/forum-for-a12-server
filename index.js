@@ -34,10 +34,17 @@ async function run() {
   try {
     const postsCollection = client.db("forum").collection("posts");
     const userCollection = client.db("forum").collection("users");
+    const voteCollection = client.db("forum").collection("votes");
 
     app.post("/posts", async (req, res) => {
       const post = req.body;
       const result = await postsCollection.insertOne(post);
+
+      res.send(result);
+    });
+    app.post("/votes", async (req, res) => {
+      const vote = req.body;
+      const result = await voteCollection.insertOne(vote);
 
       res.send(result);
     });
@@ -69,6 +76,8 @@ async function run() {
 
     app.get("/posts", async (req, res) => {
       const { query } = req.query;
+
+      console.log(query);
 
       try {
         let posts;
@@ -106,6 +115,10 @@ async function run() {
       const query = { email: email };
       const cursor = postsCollection.find(query);
       const result = await cursor.toArray();
+      res.send(result);
+    });
+    app.get("/votes", async (req, res) => {
+      const result = await voteCollection.find().toArray();
       res.send(result);
     });
 
